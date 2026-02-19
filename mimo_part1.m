@@ -1,24 +1,7 @@
-%% ==========================================================
-% Assignment 3 — Part 1 (FIXED: no mimozpk)
-% Proposed project: u -> y plant
-%
-% Outputs:
-%   - A, B2, C2, D22
-%   - FULL G(s) entries (each tf printed)
-%   - Poles
-%   - Transmission zeros (tzero)
-%   - Rosenbrock rank-drop verification (normal rank + grid min rank)
-%
-% Requires: Control System Toolbox
-%% ==========================================================
+
 clear; clc; close all;
 
-fprintf('==========================================================\n');
-fprintf('Assignment 3 — Part 1: Poles + Transmission Zeros (u -> y)\n');
-fprintf('Plus: FULL G(s) print + Rosenbrock verification\n');
-fprintf('==========================================================\n\n');
 
-%% --------------------------
 % 1) Nominal parameters (from proposal)
 C1  = 3.0e6;      % [J/°C]
 C2  = 2.5e6;      % [J/°C]
@@ -27,7 +10,6 @@ R2o = 0.012;      % [°C/W]
 R12 = 0.020;      % [°C/W]
 Ebat = 13.5 * 3.6e6;   % 13.5 kWh -> Joules [J]
 
-%% --------------------------
 % 2) Build state-space model for u -> y
 % States:  x = [T1; T2; s]
 % Inputs:  u = [Q1; Q2; Pbat]
@@ -47,7 +29,7 @@ Gss = ss(A, B2, C2, D22);
 Gss.InputName  = {'Q1','Q2','Pbat'};
 Gss.OutputName = {'T1','T2','s'};
 
-%% --------------------------
+
 % 3) Print state-space matrices
 disp('--- State-space (u -> y) ---');
 disp('A =');   disp(A);
@@ -55,7 +37,7 @@ disp('B2 =');  disp(B2);
 disp('C2 =');  disp(C2);
 disp('D22 ='); disp(D22);
 
-%% --------------------------
+
 % 4) Print FULL transfer matrix G(s) entries
 Gtf = tf(Gss);
 
@@ -70,7 +52,7 @@ for i = 1:size(Gtf,1)
 end
 disp(' ');
 
-%% --------------------------
+
 % 5) Poles and transmission zeros (built-in)
 polesG = pole(Gss);
 zerosG = tzero(Gss);
@@ -91,7 +73,6 @@ else
     disp('Stability check: Not all poles have negative real part (NOT asymptotically stable).');
 end
 
-%% --------------------------
 % 6) Rosenbrock rank-drop verification (complex grid + random samples)
 % Rosenbrock matrix:
 %   R(s) = [ sI - A   -B2
@@ -156,25 +137,9 @@ else
     disp('=> No rank drop detected on the grid: consistent with no finite transmission zeros.');
 end
 
-%% --------------------------
-% 7) OPTIONAL: show minreal() and zpk() forms (works without mimozpk)
-disp(' ');
-disp('--- OPTIONAL: minimal realization and ZPK display ---');
-Gmin = minreal(Gss, 1e-9);
-disp('Gmin(s) as zpk (MATLAB built-in zpk works for MIMO in many versions):');
-try
-    disp(zpk(Gmin));
-catch
-    disp('Your MATLAB cannot display MIMO zpk directly. (This is optional anyway.)');
-end
-
-disp(' ');
-disp('==========================================================');
-disp('DONE: Part 1 outputs printed above.');
-disp('==========================================================');
 
 
-%% ===== Proof of transmission zeros via Rosenbrock rank test =====
+%%Rosenbrock rank test 
 % For (A,B,C,D), transmission zeros are s where rank(R(s)) drops below normal rank.
 % Rosenbrock matrix:
 %   R(s) = [ sI - A   -B
@@ -236,3 +201,4 @@ else
     disp('Transmission zeros from tzero:'); disp(tz);
 end
 fprintf('=============================================\n');
+
