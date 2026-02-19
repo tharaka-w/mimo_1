@@ -177,7 +177,6 @@ fprintf('Pzu (u->z): %dx%d\n', size(Pzu,1), size(Pzu,2));
 fprintf('Pyw (w->y): %dx%d\n', size(Pyw,1), size(Pyw,2));
 fprintf('Pyu (u->y): %dx%d\n', size(Pyu,1), size(Pyu,2));
 
-fprintf('\n==========================================================\n');
-fprintf('DONE: Part 4 complete. Matrices printed + P_bal constructed.\n');
-fprintf('==========================================================\n');
+
+
 
