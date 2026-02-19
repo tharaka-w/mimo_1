@@ -1,28 +1,7 @@
-%% ==========================================================
-% Assignment 3 — Part 4 (FINAL, COPY/PASTE READY)
-%
-% Goal (per prompt):
-%   Represent the control problem in four-block form and find a state-space
-%   realization from (w,u) -> (z,y) USING the u->y subsystem in the
-%   BALANCED realization.
-%
-% We do:
-%   (1) Build u->y subsystem (thermal T1,T2) and balance it -> get Tbal
-%   (2) Build full four-block generalized plant matrices (A,B1,B2,C1,C2,D's)
-%   (3) Apply SAME state transformation x = Tbal * x_bal
-%       so A,B1,B2,C1,C2 become balanced-coordinates versions
-%   (4) Assemble P_bal : [w;u] -> [z;y]
-%   (5) Print ALL matrices + block partitions
-%
-% Requires: Control System Toolbox
-%% ==========================================================
+
 clear; clc; close all;
 
-fprintf('==========================================================\n');
-fprintf('Assignment 3 — Part 4: Four-block plant using BALANCED u->y\n');
-fprintf('==========================================================\n\n');
 
-%% --------------------------
 % 1) Nominal parameters (from proposal)
 C1  = 3.0e6;
 C2  = 2.5e6;
@@ -40,10 +19,10 @@ lam1 = 1;
 lam2 = 1;
 lamb = 1;
 
-%% ==========================================================
+
 % 2) Build u->y subsystem (thermal only), then BALANCE it
 %    states xT = [T1; T2], inputs uT = [Q1; Q2], outputs yT = [T1; T2]
-%% ==========================================================
+
 A_T = [ -(1/(C1*R1o) + 1/(C1*R12)),    1/(C1*R12);
          1/(C2*R12),                 -(1/(C2*R2o) + 1/(C2*R12)) ];
 
@@ -68,7 +47,7 @@ fprintf('--- u->y thermal subsystem is balanced ---\n');
 disp('Hankel singular values (descending) ='); disp(hsv);
 disp('Balancing transform Tbal (x = Tbal * x_bal) ='); disp(Tbal);
 
-%% ==========================================================
+
 % 3) Build FULL generalized plant matrices in ORIGINAL coordinates
 %    but with only the THERMAL states x = [T1; T2] (stable)
 %    Inputs:
@@ -80,7 +59,6 @@ disp('Balancing transform Tbal (x = Tbal * x_bal) ='); disp(Tbal);
 %
 % NOTE: SOC state s is excluded here because balancing/Gramians require stability.
 %       If instructor demands s included, we must do finite-horizon balancing.
-%% ==========================================================
 
 % State: [T1; T2]
 A = A_T;
@@ -125,7 +103,7 @@ D12(4,:) = [sqrt(lam1), 0, 0];           % sqrt(lam1)*Q1
 D12(5,:) = [0, sqrt(lam2), 0];           % sqrt(lam2)*Q2
 D12(6,:) = [0, 0, sqrt(lamb)];           % sqrt(lamb)*Pbat
 
-%% ==========================================================
+
 % 4) Transform the ENTIRE four-block plant to BALANCED coordinates
 %    x = Tbal * x_bal
 %    => A_bal = inv(Tbal)*A*Tbal
@@ -134,7 +112,7 @@ D12(6,:) = [0, 0, sqrt(lamb)];           % sqrt(lamb)*Pbat
 %       C1_bal = C1*Tbal
 %       C2_bal = C2*Tbal
 %    D blocks unchanged
-%% ==========================================================
+
 Ti = inv(Tbal);
 
 A_bal  = Ti*A*Tbal;
@@ -143,7 +121,7 @@ B2_bal = Ti*B2;
 C1_bal = C1*Tbal;
 C2_bal = C2*Tbal;
 
-%% --------------------------
+
 % 5) Print the balanced four-block realization matrices
 fprintf('\n==========================================================\n');
 fprintf('FOUR-BLOCK REALIZATION IN BALANCED COORDINATES (thermal)\n');
@@ -166,7 +144,6 @@ disp('C2_bal ='); disp(C2_bal);
 disp('D21 =');    disp(D21);
 disp('D22 =');    disp(D22);
 
-%% --------------------------
 % 6) Build generalized plant P_bal : [w;u] -> [z;y]
 B = [B1_bal, B2_bal];
 C = [C1_bal; C2_bal];
@@ -187,7 +164,7 @@ P_bal.OutputName = [z_names, y_names];
 fprintf('\n--- Generalized plant P_bal built: [w;u] -> [z;y] ---\n');
 fprintf('Size(P_bal): outputs = %d, inputs = %d\n', size(P_bal,1), size(P_bal,2));
 
-%% --------------------------
+
 % 7) Extract the four blocks (for reporting)
 Pzw = P_bal(1:6, 1:nw);
 Pzu = P_bal(1:6, nw+1:nw+3);
@@ -203,3 +180,4 @@ fprintf('Pyu (u->y): %dx%d\n', size(Pyu,1), size(Pyu,2));
 fprintf('\n==========================================================\n');
 fprintf('DONE: Part 4 complete. Matrices printed + P_bal constructed.\n');
 fprintf('==========================================================\n');
+
