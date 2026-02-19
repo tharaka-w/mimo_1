@@ -1,25 +1,7 @@
-%% ==========================================================
-% Assignment 3 — Part 2 (COPY/PASTE READY)
-% Find controllability and observability Gramians for the u -> y plant
-% and report:
-%   - Wc, Wo
-%   - eigenvalues + eigenvectors
-%   - most/least controllable directions (largest/smallest eig of Wc)
-%   - most/least observable directions (largest/smallest eig of Wo)
-%
-% Plant used (Parts 1–3):  xdot = A x + B2 u,  y = C2 x + D22 u
-% (ignore w and z)
-%
-% Requires: Control System Toolbox
-%% ==========================================================
+
 clear; clc; close all;
 
-fprintf('==========================================================\n');
-fprintf('Assignment 3 — Part 2: Gramians + most/least directions\n');
-fprintf('Plant: u -> y subsystem (ignore w, z)\n');
-fprintf('==========================================================\n\n');
 
-%% --------------------------
 % 1) Nominal parameters (from proposal)
 C1  = 3.0e6;      % [J/°C]
 C2  = 2.5e6;      % [J/°C]
@@ -28,7 +10,6 @@ R2o = 0.012;      % [°C/W]
 R12 = 0.020;      % [°C/W]
 Ebat = 13.5 * 3.6e6;   % 13.5 kWh -> Joules [J]
 
-%% --------------------------
 % 2) State-space model for u -> y
 % x = [T1; T2; s],  u = [Q1; Q2; Pbat],  y = [T1; T2; s]
 A = [ -(1/(C1*R1o) + 1/(C1*R12)),    1/(C1*R12),               0;
@@ -46,7 +27,7 @@ G = ss(A,B,C,D);
 G.InputName  = {'Q1','Q2','Pbat'};
 G.OutputName = {'T1','T2','s'};
 
-%% --------------------------
+
 % 3) Poles and a warning about Gramians
 p = pole(G);
 disp('--- Poles of (u->y) plant ---');
@@ -62,7 +43,7 @@ if any(real(p) >= 0)
              '=> Proceeding with the stable thermal 2-state subsystem (T1,T2) for Part 2.\n\n']);
 end
 
-%% --------------------------
+
 % 4) Extract stable thermal subsystem (states T1,T2; inputs Q1,Q2; outputs T1,T2)
 A_th = A(1:2,1:2);
 B_th = B(1:2,1:2);
@@ -79,7 +60,7 @@ disp('B_th ='); disp(B_th);
 disp('C_th ='); disp(C_th);
 disp('D_th ='); disp(D_th);
 
-%% --------------------------
+
 % 5) Compute controllability and observability Gramians
 Wc = gram(Gth,'c');   % controllability Gramian
 Wo = gram(Gth,'o');   % observability Gramian
@@ -97,7 +78,6 @@ disp(Wc);
 disp('--- Observability Gramian Wo (thermal subsystem) ---');
 disp(Wo);
 
-%% --------------------------
 % 6) Eigen-decomposition and most/least directions
 % Wc, Wo are symmetric PSD -> use eig, then sort by eigenvalue
 [Vc, Dc] = eig(Wc);
@@ -127,7 +107,7 @@ lam_o_most = evo_sorted(1);
 v_o_least  = Vo_sorted(:,end);
 lam_o_least = evo_sorted(end);
 
-disp('==========================================================');
+
 disp('Part 2 Results (Thermal subsystem T1,T2)');
 
 fprintf('\nControllability eigenvalues (descending):\n');
@@ -152,9 +132,7 @@ fprintf('\nLeast observable direction (eigvec of smallest eig):\n');
 disp(v_o_least);
 fprintf('Smallest eig (least observable): %.6e\n', lam_o_least);
 
-disp('==========================================================');
 
-%% --------------------------
 % 7) Optional: normalized directions (unit vectors)
 v_c_most  = v_c_most  / norm(v_c_most);
 v_c_least = v_c_least / norm(v_c_least);
@@ -168,3 +146,4 @@ disp('v_o_most_unit  ='); disp(v_o_most);
 disp('v_o_least_unit ='); disp(v_o_least);
 
 fprintf('\nDONE.\n');
+
